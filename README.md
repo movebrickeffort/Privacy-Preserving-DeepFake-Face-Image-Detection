@@ -1,6 +1,6 @@
 # Privacy-Preserving-DeepFake-Face-Image-Detection
 ## Overview
-#### A privacy-preserving Secure DeepFake Detection Network model is designed for the first time. The model uses the additive secret sharing method. In order to detect more and more DeepFake faces on the Internet, some models have been successfully proposed. However, these models focus on plaintext DeepFake faces, ignoring the problem of privacy preservation. Thus, in this paper, we design a privacy-preserving Secure DeepFake Detection Network (SecDFDNet) model for the first time. The model uses the additive secret sharing method to detect DeepFake faces. Specifically, firstly, some multiparty secure protocols are designed for non-linear activate functions, i.e., secure sigmoid protocol SecSigm, secure channel attention protocol SecChannel, and secure spatial attention protocol SecSpatial. Their securities are proofed in theoretical. Then, a privacy-preserving model SecDFDNet is proposed for secure DeepFake face detection by using the trained plaintext DeepFake detection network (DFDNet) and designed secure protocols. The experimental results show that the proposed SecDFDNet  can securely detect DeepFake faces with the similar accuracy as the plaintext DFDNet.
+#### A privacy-preserving Secure DeepFake Detection Network model is designed for the first time. The model uses the additive secret sharing method.
 
 ## Prerequisites
 #### Ubuntu 18.04
