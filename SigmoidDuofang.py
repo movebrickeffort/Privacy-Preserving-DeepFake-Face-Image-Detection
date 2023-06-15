@@ -1,19 +1,9 @@
 import torch.nn as nn
 import torch
 import torch.quantization
-import torch.nn as tnn
-import torchvision.transforms as transforms
-import random
-import datetime
-import scipy.io as io
-from PIL import Image
-import torchvision.datasets as dsets
-from tensorboard import summary
 from torch.multiprocessing import Manager
 import numpy as np
 import cv2
-import os
-from FixedPoint import FXfamily, FXnum
 import random
 import DivDuofang
 import ExpDuofang
@@ -25,7 +15,55 @@ import main
 import xgg_model
 import input
 
+
+def formatSigmoid1(out, dict_manager, event1, event2):
+    pre = out
+    out = torch.where(out < -10, out + 5, out)
+    out = torch.where(out > 10, out - 5, out)
+    out = torch.where(out < -20, out + 10, out)
+    out = torch.where(out > 20, out - 10, out)
+    out = torch.where(out < -30, out + 15, out)
+    out = torch.where(out > 30, out - 15, out)
+    out = torch.where(out < -40, out + 20, out)
+    out = torch.where(out > 40, out - 20, out)
+    out = torch.where(out < -50, out + 25, out)
+    out = torch.where(out > 50, out - 25, out)
+    mask = out - pre
+    dict_manager.update({'subtract1': mask})
+    event1.set()
+    event2.wait()
+
+    subtract2 = dict_manager['subtract2']
+    event1.clear()
+    out = out - torch.ones_like(out) * subtract2
+    return out
+
+
+def formatSigmoid2(out, dict_manager, event1, event2):
+    pre = out
+    out = torch.where(out < -10, out + 5, out)
+    out = torch.where(out > 10, out - 5, out)
+    out = torch.where(out < -20, out + 10, out)
+    out = torch.where(out > 20, out - 10, out)
+    out = torch.where(out < -30, out + 15, out)
+    out = torch.where(out > 30, out - 15, out)
+    out = torch.where(out < -40, out + 20, out)
+    out = torch.where(out > 40, out - 20, out)
+    out = torch.where(out < -50, out + 25, out)
+    out = torch.where(out > 50, out - 25, out)
+    mask = out - pre
+    dict_manager.update({'subtract2': mask})
+    event2.set()
+    event1.wait()
+
+    subtract1 = dict_manager['subtract1']
+    event2.clear()
+    out = out - torch.ones_like(out) * subtract1
+    return out
+
+
 def serverSigmoid1(u1,c1_mul,c1_res,t1,a1,b1,c1,dict_manager,event1,event2):
+    u1 = formatSigmoid1(u1,dict_manager,event1,event2)
     a1,b1,c1,t1,c1_res,c1_mul = GenerateShare.generate_share2(u1,a1,b1,c1,t1,c1_res,c1_mul)
     #print("指数开始")
     event1.clear()
@@ -47,6 +85,7 @@ def serverSigmoid1(u1,c1_mul,c1_res,t1,a1,b1,c1,dict_manager,event1,event2):
 
 
 def serverSigmoid2(u2,c2_mul,c2_res,t2,a2,b2,c2,dict_manager,event1,event2):
+    u1 = formatSigmoid1(u2, dict_manager, event1, event2)
     a2, b2, c2, t2, c2_res, c2_mul = GenerateShare.generate_share2(u2, a2, b2, c2, t2, c2_res, c2_mul)
     event1.clear()
     event2.clear()
