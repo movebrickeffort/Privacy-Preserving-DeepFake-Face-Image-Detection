@@ -9,6 +9,3 @@
 
 ## Training and Test Details
 #### When you train a RGB or YCbCr single-stream model, you should change the input (input.py or input_ycbcr.py) in train.py. The corresponding part should also be modified during testing. When testing the dual-stream model, the RGB image and its YCbCr image should be input together. When running the code under the ciphertext, run main.py
-
-## Related Works
-#### [1] Chen B J, Liu X, and Zheng Y H. A robust GAN-generated face detection method based on dual-color spaces and an improved Xception. IEEE Transactions on Circuits and Systems for Video Technology, 2021. DOI: 10.1109/TCSVT.2021.3116679.
