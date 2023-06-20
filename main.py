@@ -4,17 +4,10 @@ import torch
 import torch.quantization
 import torch.nn as tnn
 import torchvision.transforms as transforms
-import random
-import datetime
-import scipy.io as io
 from PIL import Image
 import torchvision.datasets as dsets
-from tensorboard import summary
 from torch.multiprocessing import Manager
 import numpy as np
-import cv2
-import os
-from FixedPoint import FXfamily, FXnum
 import input
 from torch.multiprocessing import Process, Queue, Pipe
 import randomC
@@ -25,6 +18,7 @@ import SecMulDuofang
 import TorchMax
 import MaxPoolingDuofang
 import torch.nn.functional as F
+from key import key
 
 def GetBN(beforeBn,channel):
     newBN = nn.BatchNorm2d(channel,eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
@@ -533,6 +527,15 @@ def xce_agg(x1,x2,new_model):
 
     return f1+f2
 
+# 定义解密函数
+def decrypt(ciphertext_image, key):
+    ciphertext = np.array(ciphertext_image).flatten()
+    binary_ciphertext = np.unpackbits(ciphertext)
+    binary_plaintext = np.bitwise_xor(binary_ciphertext, key)
+    plaintext = np.packbits(binary_plaintext)
+    plaintext_image = Image.fromarray(plaintext.reshape(ciphertext_image.size))
+    return plaintext_image
+
 
 if __name__ == '__main__':
     xgg = xgg_model.xception_agg()
@@ -560,6 +563,9 @@ if __name__ == '__main__':
     for images, labels in testLoader:
         #images = images.cuda()
         image_1, image_2 = input.readImg(images)
+        ## 解密
+        image_1 = decrypt(image_1,key)
+        image_2 = decrypt(image_2,key)
         outputs = xce_agg(image_1,image_2,new_model)
         print(outputs)
         _, predicted = torch.max(torch.tensor(outputs).data, 1)
